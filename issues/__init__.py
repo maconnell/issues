@@ -22,10 +22,14 @@ app.config.from_pyfile( os.path.expanduser('~/.issues.cfg') )
 
 mail=Mail(app)
 
+import issues.auth
 import issues.views
+import issues.users
+import issues.issue
 import issues.db
-
-
+import issues.auth
+import issues.utils
+import issues.settings
 
 #default config file:
 """

@@ -11,11 +11,15 @@ encrypt user password, reset, mail
 config - base and user's
 close issue
 
+activate emails
+
 attachments
 
 comments
 
 admin_required redirect is broken
+
+
 
 issue search
 
