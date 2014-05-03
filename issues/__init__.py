@@ -16,18 +16,28 @@ login_manager = LoginManager()
 login_manager.login_view=login_url('/login')
 login_manager.init_app(app)
 
-app.config.update(dict(
-    DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    MAIL_DEFAULT_SENDER='maconnell.todo@gmail.com',
-    MAIL_USERNAME = 'maconnell.todo@gmail.com',
-    MAIL_PASSWORD = '94959495',
-))
+import os.path
+app.config.from_pyfile( os.path.expanduser('~/.issues.cfg') )
+
+
 mail=Mail(app)
 
 import issues.views
 import issues.db
+
+
+
+#default config file:
+"""
+DEBUG = True
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 587
+MAIL_USE_TLS = True
+MAIL_USE_SSL = False
+MAIL_DEFAULT_SENDER='foo@gmail.com'
+MAIL_USERNAME = 'foo@gmail.com'
+MAIL_PASSWORD = 'password'
+
+
+"""
 
