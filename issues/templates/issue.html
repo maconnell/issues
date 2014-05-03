@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Index
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Edit issue {{form.issue_id}}</h3>
+    </div>
+    <div class="panel-body">
+
+        <form method="POST" action="/issues/{{form.issue_id}}" class="form" role="form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-inline">
+                <div class="form-group">
+                    {{ form.owner.label }} {{ form.owner(class='form-control') }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.estimated_time.label }} {{ form.estimated_time(class='form-control',size=3) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.short_text.label }} {{ form.short_text(class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ form.long_text.label }} {{ form.long_text(class='form-control',rows="10") }}
+            </div>
+
+
+            <input type="submit" class="btn btn-success btn-sm" value="Update">
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

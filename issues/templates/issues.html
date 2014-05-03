@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Index
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block content %}
+
+<table class="table table-bordered table-striped table-hover">
+    <!--
+      id             INTEGER PRIMARY KEY,
+      reporter               NOT NULL,
+      owner                  NOT NULL,
+      short_text,
+      long_text,
+      estimated_time INTEGER DEFAULT 0,
+      created_date   TIMESTAMP DEFAULT current_timestamp,
+      last_edit_date TIMESTAMP DEFAULT current_timestamp,
+      closed_date    TIMESTAMP DEFAULT NULL,
+    -->
+    <tr>
+        <th>id</th>
+        <th>reporter</th>
+        <th>owner</th>
+        <th>estimated time</th>
+        <th>Summary</th>
+        <th>Created</th>
+        <th>Status</th>
+    </tr>
+
+    <ul>
+        {% for issue in issues %}
+        <tr>
+            <td>
+                <a href="/issues/{{issue['id']}}">
+                {{ issue['id'] }}
+                </a>
+            </td>
+            <td>{{ issue['reporter'] }}</td>
+            <td>{{ issue['owner'] }}</td>
+            <td>{{ issue['estimated_time'] }}</td>
+            <td>{{ issue['short_text'] }}</td>
+            <td>{{ issue['created_date'].replace(microsecond=0) }}</td>
+
+            {% if issue['closed_date'] %}
+            <td>closed {{ issue['closed_date'] }}</td>
+            {% else %}
+            <td>Open</td>
+            {% endif %}
+
+
+        </tr>
+        {% endfor %}
+    </ul>
+
+
+
+</table>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Add new issue</h3>
+    </div>
+    <div class="panel-body">
+
+        <form method="POST" action="/issues" class="form" role="form">
+            {{ add_issue_form.hidden_tag() }}
+
+            <div class="form-inline">
+                <div class="form-group">
+                    {{ add_issue_form.owner.label }} {{ add_issue_form.owner(class='form-control') }}
+                </div>
+
+                <div class="form-group">
+                    {{ add_issue_form.estimated_time.label }} {{ add_issue_form.estimated_time(class='form-control',size=3) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ add_issue_form.short_text.label }} {{ add_issue_form.short_text(class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ add_issue_form.long_text.label }} {{ add_issue_form.long_text(class='form-control',rows="10") }}
+            </div>
+
+
+            <input type="submit" class="btn btn-success btn-sm" value="Create">
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

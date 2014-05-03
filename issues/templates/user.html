@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Index
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block content %}
+
+<table class="table">
+
+    <tr>
+        <th>id</th>
+        <th>username</th>
+        <th>email</th>
+        <th>admin</th>
+        <th>password</th>
+        <th>active</th>
+        <th>vote_weight</th>
+        <th>Actions</th>
+    </tr>
+
+
+{% for (id,name,email,admin,password,active,vote_weight,delete_user_form,set_admin_form) in userlist %}
+
+    <tr>
+        <td>{{id}}</td>
+        <td>{{name}}</td>
+        <td>{{email}}</td>
+        <td>
+
+            <form class="form-inline" method="POST" action="/users">
+            {{ set_admin_form.hidden_tag() }}
+            {{ set_admin_form.admin.label }} {{ set_admin_form.admin(class='form-control') }}
+
+            <button type="submit" class="btn btn-sm">
+            <span class="glyphicon glyphicon-minus"></span>
+            </button>
+            </form>
+
+
+            {% if admin %}
+
+
+
+
+            {% else %}
+
+
+            {% endif %}
+
+
+
+        </td>
+        <td>{{password}}</td>
+                <td>{{active}}</td>
+        <td>{{vote_weight}}</td>
+
+        <td>
+
+            <form method="POST" action="/users">
+            {{ delete_user_form.hidden_tag() }}
+            <input type="submit" class="btn btn-danger btn-sm" value="Delete User"/>
+            </form>
+
+        </td>
+    </tr>
+{% endfor %}
+
+</table>
+
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">Add new user</h3>
+    </div>
+    <div class="panel-body">
+
+        <form method="POST" action="/users" class="form-inline" role="form">
+            {{ add_user_form.hidden_tag() }}
+            {{ add_user_form.name.label }} {{ add_user_form.name(placeholder='Username', class='form-control') }}
+            {{ add_user_form.email.label }} {{ add_user_form.email(placeholder='Email address', class='form-control') }}
+            {{ add_user_form.password.label }} {{ add_user_form.password(placeholder='Password', class='form-control') }}
+
+            <input type="submit" class="btn btn-success btn-sm" value="Create">
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
