@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS issues (
   long_text,
   estimated_time INTEGER DEFAULT 0,
   severity       INTEGER DEFAULT 0,
+  open           BOOLEAN DEFAULT TRUE,
   created_date   TIMESTAMP NOT NULL DEFAULT current_timestamp,
-  last_edit_date TIMESTAMP DEFAULT NULL,            -- NULL indicates not edited since creation
-  closed_date    TIMESTAMP DEFAULT NULL,              -- indicates that the issue is closed, NULL if reopened
+  last_edit_date TIMESTAMP NOT NULL DEFAULT current_timestamp,
 
   FOREIGN KEY (reporter) REFERENCES users (id),
   FOREIGN KEY (owner) REFERENCES users (id)

@@ -14,7 +14,11 @@ Index
 
 <div class="panel panel-default">
     <div class="panel-heading">
+        {% if form.issue_id<0 %}
+        <h3 class="panel-title">Create new issue</h3>
+        {% else %}
         <h3 class="panel-title">Edit issue {{form.issue_id}}</h3>
+        {% endif %}
     </div>
     <div class="panel-body">
 
@@ -29,6 +33,15 @@ Index
                 <div class="form-group">
                     {{ form.estimated_time.label }} {{ form.estimated_time(class='form-control',size=3) }}
                 </div>
+
+                <div class="form-group">
+                    {{ form.severity.label }} {{ form.severity(class='form-control') }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.open.label }} {{ form.open(class='form-control') }}
+                </div>
+
             </div>
 
             <div class="form-group">
@@ -41,6 +54,9 @@ Index
 
             <input type="submit" class="btn btn-success btn-sm" value="Update">
         </form>
+
+
+
 
     </div>
 </div>

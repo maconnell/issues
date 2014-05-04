@@ -14,7 +14,7 @@ attachments
 
 comments
 
-activate emails
+activate emails iff config
 
 admin_required redirect is broken
 

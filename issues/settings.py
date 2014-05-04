@@ -20,7 +20,8 @@ class UpdatePasswordForm(Form):
     new_password_2= PasswordField('New password again', validators=[DataRequired()])
 
 
-
+class Form2(Form):
+    field=TextField('something', validators=[DataRequired()])
 
 
 @app.route('/settings', methods=('GET', 'POST'))
@@ -28,6 +29,11 @@ class UpdatePasswordForm(Form):
 def settings():
 
     update_password_form=UpdatePasswordForm()
+    form2=Form2()
+
+    print update_password_form
+    print form2
+
     if update_password_form.validate_on_submit():
 
         info=db.get_user_info(get_db(),g.user.id)
@@ -40,10 +46,12 @@ def settings():
         else:
             flash('Old password invalid or new passwords differ','error')
 
-        return redirect( url_for('settings'))
-    #elif other forms validate do those....
+        return redirect( url_for('settings') )
+    elif form2.validate_on_submit():
+        flash('form2 %s'%form2.field.data)
+        return redirect( url_for('settings') )
 
     else:
         # no forms validate
-        return render_template('settings.html',update_password_form=update_password_form)
+        return render_template('settings.html',update_password_form=update_password_form,form2=form2)
 

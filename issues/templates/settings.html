@@ -36,6 +36,19 @@ Settings
             </div>
         </form>
 
+        <form method="POST" action="/settings" class="form" role="form">
+            {{ form2.hidden_tag() }}
+
+            <div class="form-inline">
+                <div class="form-group">
+                    {{ form2.field(class='form-control',placeholder='something') }}
+                </div>
+            <input type="submit" class="btn btn-success btn-sm" value="form2 submit">
+            </div>
+        </form>
+
+
+
     </div>
 </div>
 

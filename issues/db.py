@@ -91,10 +91,10 @@ class TestDataBase(unittest.TestCase):
 
     def test_issues(self):
         con=get_connection(self.filename)
-        self.assertTrue( add_todo(con,'user1','user2','short_text','long_text',estimated_time=1) )
-        self.assertTrue( add_todo(con,'user1','user2','short_text','long_text') )
-        self.assertFalse( add_todo(con,'userXXX','user2','short_text','long_text') )
-        self.assertFalse( add_todo(con,'user1','userXXX','short_text','long_text') )
+        self.assertTrue( add_issue(con,'user1','user2','short_text','long_text',estimated_time=1) )
+        self.assertTrue( add_issue(con,'user1','user2','short_text','long_text') )
+        self.assertFalse( add_issue(con,'userXXX','user2','short_text','long_text') )
+        self.assertFalse( add_issue(con,'user1','userXXX','short_text','long_text') )
 
 def test_db(filename='todo.db'):
 
@@ -179,7 +179,7 @@ def get_userid(con,name):
     return None
 
 
-def add_todo(con,reporter,owner,short_text,long_text,estimated_time=0,created_date=None,last_edit_date=None):
+def add_issue(con,reporter,owner,short_text,long_text,estimated_time=0,severity=2,open=True,created_date=None,last_edit_date=None):
     """
     created_date and last_edit_date should be datatime objects if not None
     """
@@ -191,17 +191,17 @@ def add_todo(con,reporter,owner,short_text,long_text,estimated_time=0,created_da
     ownerid=get_userid(con,owner)
 
     try:
-        con.execute("INSERT INTO issues (reporter,owner,short_text,long_text,estimated_time,created_date,last_edit_date) "
-                    "VALUES (?,?,?,?,?,?,?)",
-                    (reporterid,ownerid,short_text,long_text,estimated_time,created_date,last_edit_date))
+        con.execute("INSERT INTO issues (reporter,owner,short_text,long_text,estimated_time,severity,open,created_date,last_edit_date) "
+                    "VALUES (?,?,?,?,?,?,?,?,?)",
+                    (reporterid,ownerid,short_text,long_text,estimated_time,severity,open,created_date,last_edit_date))
 
         con.commit()
         return True
     except sqlite3.Error,e:
-        pass #print 'Got error add_todo',e
+        print 'Got error add_issue',e
     return False
 
-def set_todo(con, id, owner, short_text, long_text, estimated_time):
+def set_issue(con, id, owner, short_text, long_text, estimated_time, severity, open):
     last_edit_date=datetime.datetime.now()
 
     # BUG There should be a clever way to perform the INSERT in SQL without first extracting the user ids here
@@ -213,9 +213,11 @@ def set_todo(con, id, owner, short_text, long_text, estimated_time):
                     short_text=?,
                     long_text=?,
                     estimated_time=?,
+                    severity=?,
+                    open=?,
                     last_edit_date=?
                     WHERE id = ?;''',
-                    (ownerid,short_text,long_text,estimated_time,last_edit_date,id))
+                    (ownerid,short_text,long_text,estimated_time,severity,open,last_edit_date,id))
         con.commit()
         return True
     except sqlite3.Error,e:
@@ -235,9 +237,10 @@ def get_issues(con):
            issue.short_text,
            issue.long_text,
            issue.estimated_time,
+           issue.severity,
+           issue.open,
            issue.created_date,
-           issue.last_edit_date,
-           issue.closed_date
+           issue.last_edit_date
     FROM issues issue
     JOIN   users owner on owner.id = issue.owner
     JOIN users reporter on reporter.id=issue.reporter;
@@ -255,16 +258,19 @@ def get_issue(con,id):
            issue.short_text,
            issue.long_text,
            issue.estimated_time,
+           issue.severity,
+           issue.open,
            issue.created_date,
-           issue.last_edit_date,
-           issue.closed_date
+           issue.last_edit_date
     FROM issues issue
     JOIN   users owner on owner.id = issue.owner
     JOIN users reporter on reporter.id=issue.reporter
     WHERE issue.id = ?;
     """
-    rows=con.execute(query,(id,))
-    return rows.fetchall()[0]
+    cursor=con.execute(query,(id,))
+    rows=cursor.fetchall()
+    if len(rows)<1: return None
+    return rows[0]
 
 
 
