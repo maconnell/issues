@@ -7,19 +7,18 @@ Until project is self hosting, its own TODO list is here:
 
 
 TODO:
-encrypt user password, reset, mail
-config - base and user's
-close issue
 
-activate emails
+close issue
 
 attachments
 
 comments
 
+activate emails
+
 admin_required redirect is broken
 
-
+user admin header only shown if logged in user is admin
 
 issue search
 
@@ -28,6 +27,8 @@ flask test
 
 user preferences page
 
+document setup procedure - virtualenv
 
+package
 
 

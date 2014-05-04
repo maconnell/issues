@@ -10,8 +10,9 @@ from flask_mail import Message
 
 from issue import app,login_manager,mail
 
-from issues.utils import admin_required,get_db
-
+from issues.utils import admin_required
+from issues.db import get_db
+from utils import encrypt
 
 class AddUserForm(Form):
     action = HiddenField('action',default='CREATE')
@@ -51,7 +52,9 @@ def user():
             add_user_form = AddUserForm() # create from current form values
 
             if add_user_form.validate():
-                ok=db.create_user(get_db(),add_user_form.name.data,add_user_form.email.data,add_user_form.password.data)
+                password=add_user_form.password.data
+                password_hash=encrypt(password)
+                ok=db.create_user(get_db(),add_user_form.name.data,add_user_form.email.data,password_hash)
                 if ok:
                     flash('New user %s created'%add_user_form.name.data,'ok')
                 else:

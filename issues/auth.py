@@ -9,7 +9,9 @@ from flask_login import login_required,login_user,logout_user,UserMixin,login_ur
 from flask_mail import Message
 
 from issues import app,login_manager,mail
-from issues.utils import get_db
+from issues.db import get_db
+from issues.utils import check_password
+
 
 class LoginForm(Form):
     username= TextField('username', validators=[DataRequired()])
@@ -44,8 +46,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         username=form['username'].data
-        ok=db.authenticate_user(get_db(),username,form['password'].data)
-        if ok:
+        password=form['password'].data
+        info=db.get_user_info(get_db(),username)
+
+        active=info['active']
+        password_ok=check_password( info['password'] , password )
+
+        print active,password_ok,info['password'] , password
+        if active and password_ok:
             user=get_user_object(username)
             login_user(user,remember=True) # tells Flask-login to mark us as logged in
             flash("Logged in successfully.")

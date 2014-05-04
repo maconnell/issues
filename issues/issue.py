@@ -12,7 +12,8 @@ from flask_mail import Message
 
 from issues import app,login_manager,mail
 
-from issues.utils import admin_required,get_db
+from issues.utils import admin_required
+from issues.db import get_db
 
 
 

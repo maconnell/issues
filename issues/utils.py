@@ -1,6 +1,5 @@
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
-import db
 
 from flask_wtf import Form
 from wtforms import TextField,HiddenField,SelectField,PasswordField,IntegerField,TextAreaField,BooleanField
@@ -10,19 +9,6 @@ from flask_mail import Message
 
 from issues import app,login_manager,mail
 
-
-def get_db():
-    """Opens a new database connection if there is none yet for the current application context."""
-    if not hasattr(g, 'db'):
-        g.db = db.get_connection()
-        #flash('got new connection %s'%str(g.db))
-    return g.db
-
-
-@app.teardown_appcontext
-def close_db(error):
-    """Closes the database again at the end of the request."""
-    if hasattr(g, 'db'): g.db.close()
 
 
 
@@ -45,3 +31,14 @@ def admin_required(fn):
     return decorated_view
 
 
+
+
+
+
+import werkzeug.security
+
+def encrypt(password):
+    return werkzeug.security.generate_password_hash(password,method='pbkdf2:sha1:2000', salt_length=8)
+
+def check_password(hash,password):
+    return werkzeug.security.check_password_hash(hash,password)

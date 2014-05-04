@@ -5,8 +5,29 @@ Contains all the db related code,
 
 """
 import sqlite3,datetime,random,string
+from utils import encrypt
 
-def get_connection(filename='todo.db'):
+
+# get_db and close_db "should" be moved outside so that db.py doesn't depend on flask.
+from flask import g
+from issues import app
+
+def get_db():
+    """Opens a new database connection if there is none yet for the current application context."""
+    if not hasattr(g, 'db'):
+        g.db = get_connection()
+        #flash('got new connection %s'%str(g.db))
+    return g.db
+
+@app.teardown_appcontext
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'db'): g.db.close()
+
+
+
+
+def get_connection(filename='issues.db'):
     """
     opens the database and returns a connection object
     if filename is None, use a temporary in memory db
@@ -22,13 +43,13 @@ def get_connection(filename='todo.db'):
     cur.execute("PRAGMA foreign_keys = ON;")
     con.commit()
 
-    # results from sqlite will be accesaable both as a tuple or as a dict
+    # results from sqlite will be accessible both as a tuple or as a dict
     con.row_factory = sqlite3.Row
 
     return con
 
 
-def createDB(filename='todo.db',script='db.sql'):
+def createDB(filename='issues.db',script='db.sql'):
 
     # Create tables
     con=get_connection(filename)
@@ -37,11 +58,11 @@ def createDB(filename='todo.db',script='db.sql'):
 
     # Add internal robot user, don't need to remember their password
     password=''.join(random.choice( string.ascii_letters ) for i in range(16))
-    create_user(con,'robot', '', password, active=False)
+    create_user(con,'robot', '', encrypt(password), active=False)
     con.commit()
 
     # create a default account for development
-    create_user(con,'admin', '', password='admin', active=True)
+    create_user(con,'admin', '', encrypt('admin'), active=True)
 
 
     con.close()
@@ -111,13 +132,13 @@ def test_db(filename='todo.db'):
     #cur.execute("select * from people where name_last=:who and age=:age", {"who": who, "age": age})
 
 
-def create_user(con,username,email,password,active=True):
+def create_user(con,username,email,password_hash,active=True):
     """
 
     """
     print 'create_user',username
     try:
-        con.execute("INSERT INTO users (name,email,password,active) VALUES (?,?,?,?)",(username,email,password,active))
+        con.execute("INSERT INTO users (name,email,password,active) VALUES (?,?,?,?)",(username,email,password_hash,active))
         con.commit()
         return True
     except sqlite3.Error,e:
@@ -135,16 +156,16 @@ def get_user_info(con,username):
     if len(rows)<1: return None # username not found
     return rows[0]
 
-def authenticate_user(con,username,password):
-    """
-    if password is correct for given user and they are active, return True else False
-    """
-    info=get_user_info(con,username)
-    if not info: return False
-    stored_password=info['password']
-    active=info['active']
-    if password==stored_password and active: return True
-    return False
+# def authenticate_user(con,username,password):
+#     """
+#     if password is correct for given user and they are active, return True else False
+#     """
+#     info=get_user_info(con,username)
+#     if not info: return False
+#     stored_password=info['password']
+#     active=info['active']
+#     if password==stored_password and active: return True
+#     return False
 
 
 def get_userid(con,name):
@@ -255,8 +276,8 @@ def get_users(con):
 
 
 if __name__=='__main__':
-    #createDB()
-    unittest.main()
+    createDB()
+    #unittest.main()
 
 
 def set_user_admin(con,username,isadmin):
@@ -267,5 +288,14 @@ def set_user_admin(con,username,isadmin):
         return True
     except sqlite3.Error,e:
         print 'Got error set_user_admin',e
+    return False
+
+def set_user_password(con,username,password):
+    try:
+        con.execute("UPDATE users SET password = ? WHERE name=?",(password,username))
+        con.commit()
+        return True
+    except sqlite3.Error,e:
+        print 'Got error set_user_password',e
     return False
 

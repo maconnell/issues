@@ -68,9 +68,14 @@
 
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="login">login</a></li>
-      <li><a href="logout">logout</a></li>
+        {% if g.user %}
+        <li><a href="logout">logout</a></li>
+        {% else %}
+        <li><a href="login">login</a></li>
+        {% endif %}
+
       <li><a href="users">User admin</a></li>
+
         {% if g.user %}
         <!-- <li class="navbar-text">{{g.user.get_id()}}</li> -->
         <li><a href="settings">{{g.user.get_id()}}</a></li>
