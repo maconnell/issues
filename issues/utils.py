@@ -9,7 +9,22 @@ from flask_mail import Message
 
 from issues import app,login_manager,mail
 
-
+#Some helpers for mapping severity ints to text
+# severity_array suitable for WTForm SelectField
+severity_array=[(0,'Idea'),(1,'Minor'),(2,'Normal'),(3,'Severe'),(4,'Critical')]
+def text_for_severity(level):
+    return severity_array[level][1]
+def severity_level_for_text(severity):
+    for level,name in severity_array:
+        if name==severity: return level
+    return None
+def class_for_severity(level):
+    # bootstrap class styles for these severity levels
+    print level
+    if level==2: return "bg-info"
+    if level==3: return "bg-warning"
+    if level==4: return "bg-danger"
+    return ""
 
 
 # customised login_required based upon flask-login's but which takes account of admin field

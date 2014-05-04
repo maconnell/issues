@@ -24,11 +24,10 @@ Index
         <th>Status</th>
     </tr>
 
-    <ul>
         {% for issue in issues %}
-        <tr>
+        <tr class="{{issue['severity_class']}}">
             <td>
-                <a class="btn btn-primary btn-xs" href="/issues/{{issue['id']}}" role="button"> {{ issue['id'] }} </a>
+                <a class="btn btn-primary btn-xs" href="/issues/{{issue['id']}}" role="button"> #{{ issue['id'] }} </a>
             </td>
             <td>{{ issue['reporter'] }}</td>
             <td>{{ issue['owner'] }}</td>
@@ -48,7 +47,6 @@ Index
 
         </tr>
         {% endfor %}
-    </ul>
 
 
 

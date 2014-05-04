@@ -12,7 +12,7 @@ from flask_mail import Message
 
 from issues import app,login_manager,mail
 
-from issues.utils import admin_required
+from issues.utils import admin_required,severity_array, text_for_severity, class_for_severity
 from issues.db import get_db
 
 
@@ -21,7 +21,17 @@ from issues.db import get_db
 @login_required
 def issues():
     # list all issues
-    return render_template('issues.html',issues=db.get_issues(get_db()))
+    db_issues=db.get_issues(get_db())
+
+    # in order to remap severity levels to text we convert to standard dictionary here.
+    issues=[]
+    for db_issue in db_issues:
+        issue=dict(db_issue)
+        issue['severity_class']=class_for_severity( issue['severity'] )
+        issue['severity']=text_for_severity( issue['severity'] )
+        issues.append(issue)
+
+    return render_template('issues.html',issues=issues)
 
 
 
@@ -50,7 +60,7 @@ def issue(id):
         #long_text= TextField('Summary', validators=[DataRequired()])
         long_text= TextAreaField('Details')#, validators=[DataRequired()])
         estimated_time= IntegerField('Estimated time',validators=[InputRequired()],default=0) # NOTE InputRequired necessary to accept 0
-        severity= SelectField('Severity',choices=[(0,'Idea'),(1,'Minor'),(2,'Normal'),(3,'Severe'),(4,'Critical')],default=2,coerce=int) # NOTE: coerce to get int(2) not unicode(2)
+        severity= SelectField('Severity',choices=severity_array,default=2,coerce=int) # NOTE: coerce to get int(2) not unicode(2)
         open=BooleanField('Open',default=True)
         issue_id=id
 
@@ -71,7 +81,6 @@ def issue(id):
     if request.method=='POST': # posting a new issue form
 
         if form.validate():
-            print 'setting issue to db...'
 
             if id<0:
                 ok=db.add_issue(get_db(),
@@ -86,7 +95,7 @@ def issue(id):
                     flash('Created issue!')
                 else:
                     flash('Failed to create issue (DB problem) :-(','error')
-                    return redirect( url_for("index") )
+                return redirect( url_for("index") )
 
             else:
                 ok=db.set_issue(get_db(),
@@ -106,10 +115,9 @@ def issue(id):
                     #                Here is some stuff about it...
                     #                """)
                     #mail.send(message)
-                    return redirect('/issues')
                 else:
                     flash('Failed to update issue (DB problem) :-(','error')
-                    return redirect( url_for("index") )
+                return redirect( url_for("index") )
 
         else: # form didn't validate
             print form.severity,form.severity.data,type(form.severity.data)

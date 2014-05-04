@@ -19,9 +19,16 @@
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
     <title>{% block title %}{% endblock %}</title>
 
-     <!-- Bootstrap navbar is 50px -->
+    <!-- Bootstrap navbar is 50px -->
     <style>
-        body { padding-top: 60px; }
+        body {
+            padding-top: 60px;
+        }
+
+        body {
+            padding-bottom: 50px;
+        }
+
     </style>
 
 
@@ -35,71 +42,90 @@
 
     <!-- convert flask flash message types into suitable bootstrap alert styles, should be a clean er way to do this -->
     {% for category,message in get_flashed_messages(with_categories=true) %}
-    {% if category=='error' %}
-        <div class="alert alert-danger alert-dismissable">
-    {% elif category=='warning' %}
-        <div class="alert alert-warning alert-dismissable">
-    {% elif category=='ok' %}
-        <div class="alert alert-success alert-dismissable">
-    {% else %}
-        <div class="alert alert-info alert-dismissable">
-    {% endif %}
+        {% if category=='error' %}
+            <div class="alert alert-danger alert-dismissable">
+        {% elif category=='warning' %}
+            <div class="alert alert-warning alert-dismissable">
+        {% elif category=='ok' %}
+            <div class="alert alert-success alert-dismissable">
+        {% else %}
+            <div class="alert alert-info alert-dismissable">
+        {% endif %}
 
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         {{ message }}
-    </div>
+            </div>
     {% endfor %}
-</div>
 
-  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <ul class="nav navbar-nav">
-      <li><a href="/">Home</a></li>
-      <li><a href="issues">Issues</a></li>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <ul class="nav navbar-nav navbar-collapse">
+                <li><a href="/">Home</a></li>
+                <li><a href="/issues">Issues</a></li>
 
-        <form class="navbar-form navbar-left" role="search">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search issues">
+
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search issues">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <div class="nav">
+
+                                <form method="POST" action="/settings" class="navbar-form" role="form">
+                                <input type="submit" class="btn btn-success btn-sm" value="form2 submit">
+                                </form>
+
+                            </div>
+
+                        </li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">One more separated link</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if g.user %}
+                <li><a href="logout">logout</a></li>
+                {% else %}
+                <li><a href="login">login</a></li>
+                {% endif %}
+
+                <li><a href="users">User admin</a></li>
+
+                {% if g.user %}
+                <!-- <li class="navbar-text">{{g.user.get_id()}}</li> -->
+                <li><a href="settings">{{g.user.get_id()}}</a></li>
+                {% endif %}
+            </ul>
+
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
+    </nav>
 
 
+            <div id="content" class="container">{% block content %}{% endblock %}</div>
 
 
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-        {% if g.user %}
-        <li><a href="logout">logout</a></li>
-        {% else %}
-        <li><a href="login">login</a></li>
-        {% endif %}
+            <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+                <div class="container">
+                    <ul class="nav navbar-nav">
+                        <li><a href="https://github.com/maconnell/todo">issues</a></li>
+                    </ul>
+                </div>
+                {% block footer %} {% endblock %}
+            </nav>
 
-      <li><a href="users">User admin</a></li>
-
-        {% if g.user %}
-        <!-- <li class="navbar-text">{{g.user.get_id()}}</li> -->
-        <li><a href="settings">{{g.user.get_id()}}</a></li>
-        {% endif %}
-    </ul>
-
-  </div>
-  </nav>
-
-
-
-
-    <div id="content" class="container">{% block content %}{% endblock %}</div>
-
-
-    <div id="footer" class="container">
-        <hr>
-        {% block footer %}
-        <small>
-        <a href="https://github.com/maconnell/todo">issues</a>.
-        </small>
-        {% endblock %}
-    </div>
 
 </body>
 </html>
