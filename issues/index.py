@@ -1,7 +1,3 @@
-__author__ = 'mikec'
-"""
-This file contains the application server
-"""
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db

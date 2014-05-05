@@ -1,4 +1,13 @@
+"""
+user admin page - create and delete users
+We shouldn't expand this too much, instead let admins edit via the user settings page
+Should be limited to:
+    add user by name
+    list users
+        - toggle admin flag
+        - toggle active flag
 
+"""
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db
 

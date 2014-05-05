@@ -1,4 +1,8 @@
+"""
+user settings routes - change password and any other user settings that become available
+TBD: edit email address,
 
+"""
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db
 

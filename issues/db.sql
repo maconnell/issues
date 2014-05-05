@@ -54,7 +54,10 @@ CREATE TABLE IF NOT EXISTS comments (
 
 CREATE TABLE IF NOT EXISTS attachments (
   id   INTEGER PRIMARY KEY,
-  blob,
+  blob,       -- contents if we decide to store inside db
+  filename,   -- filename of blob if stored outside db (most likely)
+  mimetype,   -- mimetype as specified by the client, ie "text/plain" 
+
   date TIMESTAMP,
   owner NOT NULL,
   comment,

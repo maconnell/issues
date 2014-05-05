@@ -1,5 +1,9 @@
 
-# NOTE this is only called "issue.py" and not "issues.py" to avoid it shadowing the issues module namespace
+"""
+Handle both the /issues issues list page and /issues/<id> page for creation/editing
+
+NOTE this is only called "issue.py" and not "issues.py" to avoid it shadowing the issues module namespace
+"""
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db

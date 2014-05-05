@@ -1,3 +1,7 @@
+"""
+login/out routes and all things flask-login related
+"""
+
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db

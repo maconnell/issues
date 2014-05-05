@@ -23,7 +23,7 @@ from flask_mail import Mail
 mail=Mail(app)
 
 import issues.auth
-import issues.views
+import issues.index
 import issues.users
 import issues.issue
 import issues.db
