@@ -95,11 +95,12 @@ def issue(id):
                     estimated_time=form.estimated_time.data,
                     severity=form.severity.data,
                     open=form.open.data)
-                if ok:
-                    flash('Created issue!')
-                else:
+                if ok == False:
                     flash('Failed to create issue (DB problem) :-(','error')
-                return redirect( url_for("index") )
+                    return redirect( url_for("issues") )
+                else:
+                    flash('Created issue!')
+                    return redirect( url_for("issue",id=ok) )
 
             else:
                 ok=db.set_issue(get_db(),
@@ -121,7 +122,7 @@ def issue(id):
                     #mail.send(message)
                 else:
                     flash('Failed to update issue (DB problem) :-(','error')
-                return redirect( url_for("index") )
+                return redirect( url_for("issue",id=id) )
 
         else: # form didn't validate
             print form.severity,form.severity.data,type(form.severity.data)

@@ -182,6 +182,8 @@ def get_userid(con,name):
 def add_issue(con,reporter,owner,short_text,long_text,estimated_time=0,severity=2,open=True,created_date=None,last_edit_date=None):
     """
     created_date and last_edit_date should be datatime objects if not None
+    Returns the id(rowid) of the inserted issue if possible, else True. False on error
+    NOTE the rowid is not guaranteed to be correct.
     """
     if not created_date: created_date=datetime.datetime.now()
     if not last_edit_date: last_edit_date=datetime.datetime.now()
@@ -191,11 +193,14 @@ def add_issue(con,reporter,owner,short_text,long_text,estimated_time=0,severity=
     ownerid=get_userid(con,owner)
 
     try:
-        con.execute("INSERT INTO issues (reporter,owner,short_text,long_text,estimated_time,severity,open,created_date,last_edit_date) "
+        cursor=con.cursor()
+        cursor.execute("INSERT INTO issues (reporter,owner,short_text,long_text,estimated_time,severity,open,created_date,last_edit_date) "
                     "VALUES (?,?,?,?,?,?,?,?,?)",
                     (reporterid,ownerid,short_text,long_text,estimated_time,severity,open,created_date,last_edit_date))
 
         con.commit()
+        rowid=cursor.lastrowid
+        if rowid: return rowid
         return True
     except sqlite3.Error,e:
         print 'Got error add_issue',e
@@ -281,10 +286,6 @@ def get_users(con):
 
 
 
-if __name__=='__main__':
-    createDB()
-    #unittest.main()
-
 
 def set_user_admin(con,username,isadmin):
     print 'db.set_user_admin',username,isadmin
@@ -305,3 +306,10 @@ def set_user_password(con,username,password):
         print 'Got error set_user_password',e
     return False
 
+
+
+if __name__=='__main__':
+    #createDB()
+    #unittest.main()
+    from issues import db
+    print db.get_issues( get_db() )

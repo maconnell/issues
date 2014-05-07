@@ -21,9 +21,9 @@ def severity_level_for_text(severity):
 def class_for_severity(level):
     # bootstrap class styles for these severity levels
     print level
-    if level==2: return "bg-info"
-    if level==3: return "bg-warning"
-    if level==4: return "bg-danger"
+    #if level==2: return "info"
+    if level==3: return "warning"
+    if level==4: return "danger"
     return ""
 
 

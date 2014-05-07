@@ -19,6 +19,10 @@ import os.path
 app.config.from_pyfile( os.path.expanduser('~/.issues.cfg') )
 
 
+upload_folder=os.path.abspath(os.path.join(os.path.dirname(__file__),'../uploads'))
+print upload_folder
+
+app.config['UPLOAD_FOLDER']=upload_folder
 from flask_mail import Mail
 mail=Mail(app)
 
@@ -30,12 +34,14 @@ import issues.db
 import issues.auth
 import issues.utils
 import issues.settings
+import issues.uploads
 
 #default config file:
 """
 # Flask:
 DEBUG = True
 MAX_CONTENT_LENGTH = 16 * 1024*1024 # for file uploads
+UPLOAD_FOLDER='uploads'
 
 # Mail:
 MAIL_SERVER = 'smtp.gmail.com'
