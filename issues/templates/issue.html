@@ -56,12 +56,31 @@ Index
         </form>
 
     </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Attachments</div>
+    <ol>
+
+        {% for att in attachments %}
+        <li><a href="/uploads/{{ att[1] }}">{{ att[0] }}</a></li>
+        {% endfor %}
+
+    </ol>
 
 
+    <form method="POST" action="/issues/{{new_att_form.issue_id}}" method="post" enctype="multipart/form-data"
+          class="form-inline" role="form">
+        {{ new_att_form.hidden_tag() }}
+        <div class="form-group">
+            {{ new_att_form.filename() }}
+        </div>
+        <button type="submit" class="btn btn-success btn-sm">Add new attachment</button>
 
-
+    </form>
 
 
 </div>
+
 
 {% endblock %}

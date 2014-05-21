@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS attachments (
   filename,   -- filename of blob if stored outside db (most likely)
   mimetype,   -- mimetype as specified by the client, ie "text/plain" 
 
-  date TIMESTAMP,
+  date TIMESTAMP DEFAULT current_timestamp,
   owner NOT NULL,
   comment,
   issue,

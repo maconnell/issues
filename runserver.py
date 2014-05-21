@@ -8,4 +8,9 @@ Installing, first run
 4. login is as admin/admin and change password!
 """
 
-app.run(debug=True,host='0.0.0.0',port=8080)
+
+# Release:
+#app.run(debug=False,host='0.0.0.0',port=8080)
+
+# Debugging / development:
+app.run(debug=True)

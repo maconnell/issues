@@ -4,11 +4,13 @@ Handle both the /issues issues list page and /issues/<id> page for creation/edit
 
 NOTE this is only called "issue.py" and not "issues.py" to avoid it shadowing the issues module namespace
 """
+import os
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
 import db
 
 from flask_wtf import Form
+from werkzeug.utils import secure_filename
 from wtforms import TextField,HiddenField,SelectField,PasswordField,IntegerField,TextAreaField,BooleanField
 from wtforms.validators import DataRequired,InputRequired
 from flask_login import login_required,login_user,logout_user,UserMixin,login_url,current_user
@@ -19,7 +21,7 @@ from issues import app,login_manager,mail
 from issues.utils import admin_required,severity_array, text_for_severity, class_for_severity
 from issues.db import get_db
 
-
+from uploads import UploadForm
 
 @app.route('/issues', methods=('GET',))
 @login_required
@@ -59,6 +61,7 @@ def issue(id):
 
     # Create a specialised Form with the correct user choices
     class EditIssueForm(Form):
+        formname=HiddenField('formname',default='EditIssue')
         owner= SelectField('Assign to', validators=[DataRequired()],choices=user_choices)
         short_text= TextField('Summary', validators=[DataRequired()])
         #long_text= TextField('Summary', validators=[DataRequired()])
@@ -68,33 +71,52 @@ def issue(id):
         open=BooleanField('Open',default=True)
         issue_id=id
 
-    form=EditIssueForm()
+    edit_issue_form=EditIssueForm()
+    new_att_form=UploadForm()
+    new_att_form.issue_id=id
 
+    print type(request.form)
+    print dir(request.form)
+    print request.form.items()
+    print request.form.get('formname','UNKNOWN')
+
+
+    # If GET, make all the forms and render the page
     if request.method=='GET':
-
         issue=db.get_issue(get_db(),id)
         if issue: # if we are editing an existing issue, fill in values, else new issue and defaults
-            form.owner.data=issue['owner']
-            form.short_text.data=issue['short_text']
-            form.long_text.data=issue['long_text']
-            form.severity.data=issue['severity']
-            form.open.data=issue['open']
+            edit_issue_form.owner.data=issue['owner']
+            edit_issue_form.short_text.data=issue['short_text']
+            edit_issue_form.long_text.data=issue['long_text']
+            edit_issue_form.severity.data=issue['severity']
+            edit_issue_form.open.data=issue['open']
 
-        return render_template('issue.html',form=form)
+        # Get all attachments, make a list of tuples containing the filename (as given and uploaded under) and secure value that we actually saved
+        atts=db.get_attachments(get_db(),id)
+        attachment_list=[]
+        for att in atts:
+            attachment_list.append( (att['filename'] , secure_filename(att['filename'])) )
 
-    if request.method=='POST': # posting a new issue form
+        return render_template('issue.html',form=edit_issue_form,attachments=attachment_list,new_att_form=new_att_form)
 
-        if form.validate():
+    # Else we should have a POST form submission, if not, bail:
+    if request.method!='POST':
+        flash('Unhandled method')
+        return redirect(url_for("issues"))
 
+    # method is POST, but which form is submitted?
+    if request.form.get('formname')=='EditIssue': # posting a new issue form
+
+        if edit_issue_form.validate():
             if id<0:
                 ok=db.add_issue(get_db(),
                     reporter=g.user.get_id(),
-                    owner=form.owner.data,
-                    short_text=form.short_text.data,
-                    long_text=form.long_text.data,
-                    estimated_time=form.estimated_time.data,
-                    severity=form.severity.data,
-                    open=form.open.data)
+                    owner=edit_issue_form.owner.data,
+                    short_text=edit_issue_form.short_text.data,
+                    long_text=edit_issue_form.long_text.data,
+                    estimated_time=edit_issue_form.estimated_time.data,
+                    severity=edit_issue_form.severity.data,
+                    open=edit_issue_form.open.data)
                 if ok == False:
                     flash('Failed to create issue (DB problem) :-(','error')
                     return redirect( url_for("issues") )
@@ -105,12 +127,12 @@ def issue(id):
             else:
                 ok=db.set_issue(get_db(),
                                id,
-                               owner=form.owner.data,
-                               short_text=form.short_text.data,
-                               long_text=form.long_text.data,
-                               estimated_time=form.estimated_time.data,
-                               severity=form.severity.data,
-                               open=form.open.data)
+                               owner=edit_issue_form.owner.data,
+                               short_text=edit_issue_form.short_text.data,
+                               long_text=edit_issue_form.long_text.data,
+                               estimated_time=edit_issue_form.estimated_time.data,
+                               severity=edit_issue_form.severity.data,
+                               open=edit_issue_form.open.data)
                 if ok:
                     flash('Updated issue!')
 
@@ -125,8 +147,18 @@ def issue(id):
                 return redirect( url_for("issue",id=id) )
 
         else: # form didn't validate
-            print form.severity,form.severity.data,type(form.severity.data)
-            for field,errors in form.errors.items():
+            print edit_issue_form.severity,edit_issue_form.severity.data,type(edit_issue_form.severity.data)
+            for field,errors in edit_issue_form.errors.items():
                 for error in errors: flash('Failed to validate %s:%s'%(field,error),'error')
             return redirect( url_for("index") )
 
+    if request.form.get('formname')=='UploadAttachment':
+        print 'Upload attachment'
+        print new_att_form
+        if new_att_form.validate_on_submit():
+            file=request.files['filename']
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) # will throw on error
+                db.add_attachment(get_db(),id,current_user.id,file.filename)
+                return redirect(url_for('issue',id=id))

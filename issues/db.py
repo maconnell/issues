@@ -307,6 +307,29 @@ def set_user_password(con,username,password):
     return False
 
 
+def get_attachments(con,issue_id):
+    try:
+        rows=con.execute("SELECT * FROM attachments WHERE issue = ?",(issue_id,))
+        return rows.fetchall()
+    except sqlite3.Error,e:
+        print 'Got error get_attachments',e
+    return False
+
+def add_attachment(con,issue_id,owner_name,filename):
+    try:
+
+        # BUG There should be a clever way to perform the INSERT in SQL without first extracting the user ids here
+        owner_id=get_userid(con,owner_name)
+
+        print 'Trying to add attachment (owner_id,issue_id,filename):',(owner_id,issue_id,filename)
+        con.execute("INSERT INTO attachments (owner,issue,filename) VALUES (?,?,?)",(owner_id,issue_id,filename))
+        con.commit()
+        return True
+    except sqlite3.Error,e:
+        print 'Got error get_attachments',e
+    return False
+
+
 
 if __name__=='__main__':
     #createDB()
