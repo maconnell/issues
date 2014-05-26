@@ -60,26 +60,37 @@ Index
 
 <div class="panel panel-default">
     <div class="panel-heading">Attachments</div>
-    <ol>
+    <div class="panel-body">
+        <ol>
 
-        {% for att in attachments %}
-        <li><a href="/uploads/{{ att[1] }}">{{ att[0] }}</a></li>
-        {% endfor %}
+            {% for att in attachments %}
+            <li><a href="/uploads/{{ att[1] }}">{{ att[0] }}</a></li>
+            {% endfor %}
 
-    </ol>
+        </ol>
 
+        <div>
+            <form method="POST" action="/issues/{{new_att_form.issue_id}}" method="post" enctype="multipart/form-data"
+                  class="form-inline" role="form">
+                {{ new_att_form.hidden_tag() }}
+                <div class="form-group">
+                    {{ new_att_form.filename() }}
+                </div>
+                <button type="submit" class="btn btn-success btn-sm">Add new attachment</button>
 
-    <form method="POST" action="/issues/{{new_att_form.issue_id}}" method="post" enctype="multipart/form-data"
-          class="form-inline" role="form">
-        {{ new_att_form.hidden_tag() }}
-        <div class="form-group">
-            {{ new_att_form.filename() }}
+            </form>
         </div>
-        <button type="submit" class="btn btn-success btn-sm">Add new attachment</button>
+    </div>
 
-    </form>
+</div>
 
 
+<div class="panel panel-default">
+    <div class="panel-heading">Comments</div>
+    <div class="panel-body">
+
+
+    </div>
 </div>
 
 
