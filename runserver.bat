@@ -1,1 +1,1 @@
-env\scripts\pythonw runserver.py
+start env\scripts\pythonw runserver.py

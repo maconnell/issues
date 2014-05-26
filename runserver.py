@@ -10,7 +10,7 @@ Installing, first run
 
 
 # Release:
-#app.run(debug=False,host='0.0.0.0',port=8080)
+app.run(debug=False,host='0.0.0.0',port=8080)
 
 # Debugging / development:
-app.run(debug=True)
+#app.run(debug=True,port=8080)

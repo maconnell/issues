@@ -4,6 +4,7 @@ Handle both the /issues issues list page and /issues/<id> page for creation/edit
 
 NOTE this is only called "issue.py" and not "issues.py" to avoid it shadowing the issues module namespace
 """
+from issues.mail import send_issue_mail
 import os
 
 from flask import Flask,g,flash,render_template,redirect,request,url_for
@@ -14,7 +15,6 @@ from werkzeug.utils import secure_filename
 from wtforms import TextField,HiddenField,SelectField,PasswordField,IntegerField,TextAreaField,BooleanField
 from wtforms.validators import DataRequired,InputRequired
 from flask_login import login_required,login_user,logout_user,UserMixin,login_url,current_user
-from flask_mail import Message
 
 from issues import app,login_manager,mail
 
@@ -109,7 +109,7 @@ def issue(id):
 
         if edit_issue_form.validate():
             if id<0:
-                ok=db.add_issue(get_db(),
+                id=db.add_issue(get_db(),
                     reporter=g.user.get_id(),
                     owner=edit_issue_form.owner.data,
                     short_text=edit_issue_form.short_text.data,
@@ -117,12 +117,13 @@ def issue(id):
                     estimated_time=edit_issue_form.estimated_time.data,
                     severity=edit_issue_form.severity.data,
                     open=edit_issue_form.open.data)
-                if ok == False:
+                if id == False:
                     flash('Failed to create issue (DB problem) :-(','error')
                     return redirect( url_for("issues") )
                 else:
                     flash('Created issue!')
-                    return redirect( url_for("issue",id=ok) )
+                    send_issue_mail(id,new=True)
+                    return redirect( url_for("issue",id=id) )
 
             else:
                 ok=db.set_issue(get_db(),
@@ -135,13 +136,8 @@ def issue(id):
                                open=edit_issue_form.open.data)
                 if ok:
                     flash('Updated issue!')
+                    send_issue_mail(id,new=False)
 
-                    #message=Message(subject='New issue created!',
-                    #                recipients=['michael.connell@gmail.com'],
-                    #                body="""
-                    #                Here is some stuff about it...
-                    #                """)
-                    #mail.send(message)
                 else:
                     flash('Failed to update issue (DB problem) :-(','error')
                 return redirect( url_for("issue",id=id) )

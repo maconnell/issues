@@ -5,6 +5,7 @@ from flask import Flask
 
 app = Flask(__name__)
 app.secret_key=uuid.uuid4().hex
+app.secret_key='sdfsdgfsdgdfgfhggdfghdfgdfgdfg' # dev only - using a constant secret key allows session logins to remain logged in between server restarts
 
 import flask_wtf
 flask_wtf.CsrfProtect(app)
@@ -35,6 +36,7 @@ import issues.auth
 import issues.utils
 import issues.settings
 import issues.uploads
+import issues.mail
 
 #default config file:
 """
@@ -42,6 +44,9 @@ import issues.uploads
 DEBUG = True
 MAX_CONTENT_LENGTH = 16 * 1024*1024 # for file uploads
 UPLOAD_FOLDER='uploads'
+
+# Necessary for creating external URLs when mailing
+SERVER_NAME='my_server_name'
 
 # Mail:
 MAIL_SERVER = 'smtp.gmail.com'

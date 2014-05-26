@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS issues (
   owner          NOT NULL,
   short_text,
   long_text,
+  cc,             -- comma separated list of usernames - not yet used
   estimated_time INTEGER DEFAULT 0,
   severity       INTEGER DEFAULT 0,
   open           BOOLEAN DEFAULT TRUE,

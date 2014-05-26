@@ -277,6 +277,17 @@ def get_issue(con,id):
     if len(rows)<1: return None
     return rows[0]
 
+def get_email(con,name):
+    """
+    return stored email address of user with this name or None
+    """
+    print 'get_email with name=',name
+    rows=con.execute("SELECT email FROM users WHERE name = ?",(name,))
+    print 'rows=',rows
+    rows=rows.fetchall()
+    print 'rows=',rows
+    if len(rows)<1: return None
+    return rows[0][0]
 
 
 def get_users(con):
